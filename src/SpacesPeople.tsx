@@ -8,6 +8,7 @@ type Tab = "ownership" | "membership";
 interface CampaignMember {
   email: string;
   roles: Record<string, Role>;
+  pending?: boolean;
 }
 
 interface MembershipCampaign {
@@ -35,6 +36,11 @@ const members: CampaignMember[] = [
   {
     email: "joe@squadance",
     roles: { "Campaign #1": "Admin", "Campaign #3": "Viewer", "Campaign #5": "Member", "Campaign #7": "Finance" },
+  },
+  {
+    email: "sarah.wilson@gmail.com",
+    roles: { "Campaign #1": "Member", "Campaign #3": null, "Campaign #5": null, "Campaign #7": null },
+    pending: true,
   },
 ];
 
@@ -91,7 +97,7 @@ function RoleSelect({ role }: { role: Role }) {
   if (!role) {
     return (
       <Menu.Root>
-        <Menu.Trigger className="text-gray-400 text-base hover:text-gray-600 transition-colors px-2">
+        <Menu.Trigger className="text-black text-base hover:text-gray-600 transition-colors px-2">
           +
         </Menu.Trigger>
         <Menu.Portal>
@@ -263,7 +269,7 @@ function OwnershipTab() {
       <div className="border-t border-gray-200">
         {/* Header Row */}
         <div className="grid grid-cols-5 py-3 border-b border-gray-100">
-          <div className="text-xs text-gray-400">User</div>
+          <div className="text-xs text-gray-400">Members</div>
           {campaigns.map((campaign) => (
             <div key={campaign} className="text-xs text-black text-center">
               {campaign}
@@ -277,10 +283,20 @@ function OwnershipTab() {
             key={index}
             className="grid grid-cols-5 py-2 border-b border-gray-100 items-center"
           >
-            <div className="text-xs text-black font-mono">{member.email}</div>
+            <div className={`text-xs font-mono ${member.pending ? "text-gray-400" : "text-black"}`}>
+              {member.email}
+            </div>
             {campaigns.map((campaign) => (
               <div key={campaign} className="flex justify-center">
-                <RoleSelect role={member.roles[campaign]} />
+                {member.pending ? (
+                  member.roles[campaign] && (
+                    <span className="text-xs text-gray-400">
+                      {member.roles[campaign]} (Pending)
+                    </span>
+                  )
+                ) : (
+                  <RoleSelect role={member.roles[campaign]} />
+                )}
               </div>
             ))}
           </div>
