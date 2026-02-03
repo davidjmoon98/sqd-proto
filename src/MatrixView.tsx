@@ -208,7 +208,7 @@ function ModalRoleSelect({ defaultRole }: { defaultRole: Role }) {
   );
 }
 
-export default function MatrixView() {
+export default function MatrixView({ crosshair }: { crosshair: boolean }) {
   const [hoverRow, setHoverRow] = useState<number | null>(null);
   const [hoverCol, setHoverCol] = useState<number | null>(null);
 
@@ -280,7 +280,7 @@ export default function MatrixView() {
           {allCampaigns.map((campaign, colIdx) => (
             <div
               key={campaign.name}
-              className={`text-xs text-black text-center py-3 flex items-center justify-center transition-colors ${hoverCol === colIdx ? "bg-gray-50" : ""}`}
+              className={`text-xs text-black text-center py-3 flex items-center justify-center transition-colors ${crosshair && hoverCol === colIdx ? "bg-gray-50" : ""}`}
             >
               {campaign.name}
             </div>
@@ -298,7 +298,7 @@ export default function MatrixView() {
             }}
           >
             <div
-              className={`text-xs font-mono py-2 flex items-center transition-colors ${member.pending ? "text-gray-400" : "text-black"} ${hoverRow === rowIdx ? "bg-gray-50" : ""}`}
+              className={`text-xs font-mono py-2 flex items-center transition-colors ${member.pending ? "text-gray-400" : "text-black"} ${crosshair && hoverRow === rowIdx ? "bg-gray-50" : ""}`}
               onMouseEnter={() => { setHoverRow(rowIdx); setHoverCol(null); }}
             >
               {member.email}{member.isCurrentUser && <span className="text-gray-400 font-sans ml-1">(you)</span>}
@@ -306,7 +306,7 @@ export default function MatrixView() {
             {allCampaigns.map((campaign, colIdx) => (
               <div
                 key={campaign.name}
-                className={`flex items-center justify-center py-2 transition-colors ${hoverRow === rowIdx || hoverCol === colIdx ? "bg-gray-50" : ""}`}
+                className={`flex items-center justify-center py-2 transition-colors ${crosshair && (hoverRow === rowIdx || hoverCol === colIdx) ? "bg-gray-50" : ""}`}
                 onMouseEnter={() => { setHoverRow(rowIdx); setHoverCol(colIdx); }}
               >
                 {member.pending ? (

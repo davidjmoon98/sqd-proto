@@ -243,7 +243,7 @@ function MembersDropdown({ campaign }: { campaign: MembershipCampaign }) {
   );
 }
 
-function OwnershipTab() {
+function OwnershipTab({ crosshair }: { crosshair: boolean }) {
   const [hoverRow, setHoverRow] = useState<number | null>(null);
   const [hoverCol, setHoverCol] = useState<number | null>(null);
 
@@ -310,7 +310,7 @@ function OwnershipTab() {
           {campaigns.map((campaign, colIdx) => (
             <div
               key={campaign}
-              className={`text-xs text-black text-center py-3 flex items-center justify-center transition-colors ${hoverCol === colIdx ? "bg-gray-50" : ""}`}
+              className={`text-xs text-black text-center py-3 flex items-center justify-center transition-colors ${crosshair && hoverCol === colIdx ? "bg-gray-50" : ""}`}
             >
               {campaign}
             </div>
@@ -324,7 +324,7 @@ function OwnershipTab() {
             className="grid grid-cols-5 border-b border-gray-100 items-stretch"
           >
             <div
-              className={`text-xs font-mono py-2 flex items-center transition-colors ${member.pending ? "text-gray-400" : "text-black"} ${hoverRow === rowIdx ? "bg-gray-50" : ""}`}
+              className={`text-xs font-mono py-2 flex items-center transition-colors ${member.pending ? "text-gray-400" : "text-black"} ${crosshair && hoverRow === rowIdx ? "bg-gray-50" : ""}`}
               onMouseEnter={() => { setHoverRow(rowIdx); setHoverCol(null); }}
             >
               {member.email}{member.isCurrentUser && <span className="text-gray-400 font-sans ml-1">(you)</span>}
@@ -332,7 +332,7 @@ function OwnershipTab() {
             {campaigns.map((campaign, colIdx) => (
               <div
                 key={campaign}
-                className={`flex items-center justify-center py-2 transition-colors ${hoverRow === rowIdx || hoverCol === colIdx ? "bg-gray-50" : ""}`}
+                className={`flex items-center justify-center py-2 transition-colors ${crosshair && (hoverRow === rowIdx || hoverCol === colIdx) ? "bg-gray-50" : ""}`}
                 onMouseEnter={() => { setHoverRow(rowIdx); setHoverCol(colIdx); }}
               >
                 {member.pending ? (
@@ -390,7 +390,7 @@ function MembershipTab() {
   );
 }
 
-export default function SpacesPeople() {
+export default function SpacesPeople({ crosshair }: { crosshair: boolean }) {
   const [activeTab, setActiveTab] = useState<Tab>("ownership");
 
   return (
@@ -423,7 +423,7 @@ export default function SpacesPeople() {
       </div>
 
       {/* Tab Content */}
-      {activeTab === "ownership" ? <OwnershipTab /> : <MembershipTab />}
+      {activeTab === "ownership" ? <OwnershipTab crosshair={crosshair} /> : <MembershipTab />}
     </div>
   );
 }
