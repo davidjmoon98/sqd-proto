@@ -9,6 +9,7 @@ interface CampaignMember {
   email: string;
   roles: Record<string, Role>;
   pending?: boolean;
+  isCurrentUser?: boolean;
 }
 
 interface MembershipCampaign {
@@ -23,7 +24,8 @@ const campaigns = ["Campaign #1", "Campaign #3", "Campaign #5", "Campaign #7"];
 const members: CampaignMember[] = [
   {
     email: "davidjmoon@squadance",
-    roles: { "Campaign #1": "Member", "Campaign #3": null, "Campaign #5": "Viewer", "Campaign #7": "Admin" },
+    roles: { "Campaign #1": "Admin", "Campaign #3": "Admin", "Campaign #5": "Admin", "Campaign #7": "Admin" },
+    isCurrentUser: true,
   },
   {
     email: "elvin@squadance",
@@ -34,12 +36,41 @@ const members: CampaignMember[] = [
     roles: { "Campaign #1": "Admin", "Campaign #3": "Viewer", "Campaign #5": null, "Campaign #7": "Member" },
   },
   {
-    email: "joe@squadance",
+    email: "pablo@squadance",
     roles: { "Campaign #1": "Admin", "Campaign #3": "Viewer", "Campaign #5": "Member", "Campaign #7": "Finance" },
+  },
+  {
+    email: "jane.doe@squadance",
+    roles: { "Campaign #1": "Viewer", "Campaign #3": "Member", "Campaign #5": null, "Campaign #7": "Viewer" },
+  },
+  {
+    email: "mike.chen@squadance",
+    roles: { "Campaign #1": "Member", "Campaign #3": "Admin", "Campaign #5": "Finance", "Campaign #7": "Member" },
+  },
+  {
+    email: "lisa.park@squadance",
+    roles: { "Campaign #1": "Finance", "Campaign #3": null, "Campaign #5": "Member", "Campaign #7": "Finance" },
+  },
+  {
+    email: "tom.wright@squadance",
+    roles: { "Campaign #1": null, "Campaign #3": "Member", "Campaign #5": "Admin", "Campaign #7": null },
+  },
+  {
+    email: "anna.garcia@squadance",
+    roles: { "Campaign #1": "Viewer", "Campaign #3": "Finance", "Campaign #5": null, "Campaign #7": "Admin" },
+  },
+  {
+    email: "ryan.taylor@squadance",
+    roles: { "Campaign #1": "Member", "Campaign #3": "Member", "Campaign #5": "Viewer", "Campaign #7": "Member" },
   },
   {
     email: "sarah.wilson@gmail.com",
     roles: { "Campaign #1": "Member", "Campaign #3": null, "Campaign #5": null, "Campaign #7": null },
+    pending: true,
+  },
+  {
+    email: "kevin.brown@gmail.com",
+    roles: { "Campaign #1": null, "Campaign #3": "Member", "Campaign #5": null, "Campaign #7": "Viewer" },
     pending: true,
   },
 ];
@@ -97,7 +128,7 @@ function RoleSelect({ role }: { role: Role }) {
   if (!role) {
     return (
       <Menu.Root>
-        <Menu.Trigger className="text-black text-base hover:text-gray-600 transition-colors px-2">
+        <Menu.Trigger className="text-black text-base hover:text-gray-600 hover:bg-gray-200 rounded transition-colors px-2">
           +
         </Menu.Trigger>
         <Menu.Portal>
@@ -120,7 +151,7 @@ function RoleSelect({ role }: { role: Role }) {
 
   return (
     <Menu.Root>
-      <Menu.Trigger className="flex items-center gap-1 px-2 py-1 text-xs text-slate-900 hover:bg-gray-100 rounded transition-colors">
+      <Menu.Trigger className="flex items-center gap-1 px-2 py-1 text-xs text-slate-900 hover:bg-gray-200 rounded transition-colors">
         <span>{role}</span>
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -213,6 +244,9 @@ function MembersDropdown({ campaign }: { campaign: MembershipCampaign }) {
 }
 
 function OwnershipTab() {
+  const [hoverRow, setHoverRow] = useState<number | null>(null);
+  const [hoverCol, setHoverCol] = useState<number | null>(null);
+
   return (
     <>
       {/* Section Header */}
@@ -266,34 +300,49 @@ function OwnershipTab() {
       </div>
 
       {/* Table */}
-      <div className="border-t border-gray-200">
+      <div
+        className="border-t border-gray-200"
+        onMouseLeave={() => { setHoverRow(null); setHoverCol(null); }}
+      >
         {/* Header Row */}
-        <div className="grid grid-cols-5 py-3 border-b border-gray-100">
-          <div className="text-xs text-gray-400">Members</div>
-          {campaigns.map((campaign) => (
-            <div key={campaign} className="text-xs text-black text-center">
+        <div className="grid grid-cols-5 border-b border-gray-100 items-stretch">
+          <div className="text-xs text-gray-400 py-3 flex items-center">Members</div>
+          {campaigns.map((campaign, colIdx) => (
+            <div
+              key={campaign}
+              className={`text-xs text-black text-center py-3 flex items-center justify-center transition-colors ${hoverCol === colIdx ? "bg-gray-50" : ""}`}
+            >
               {campaign}
             </div>
           ))}
         </div>
 
         {/* Data Rows */}
-        {members.map((member, index) => (
+        {members.map((member, rowIdx) => (
           <div
-            key={index}
-            className="grid grid-cols-5 py-2 border-b border-gray-100 items-center"
+            key={rowIdx}
+            className="grid grid-cols-5 border-b border-gray-100 items-stretch"
           >
-            <div className={`text-xs font-mono ${member.pending ? "text-gray-400" : "text-black"}`}>
-              {member.email}
+            <div
+              className={`text-xs font-mono py-2 flex items-center transition-colors ${member.pending ? "text-gray-400" : "text-black"} ${hoverRow === rowIdx ? "bg-gray-50" : ""}`}
+              onMouseEnter={() => { setHoverRow(rowIdx); setHoverCol(null); }}
+            >
+              {member.email}{member.isCurrentUser && <span className="text-gray-400 font-sans ml-1">(you)</span>}
             </div>
-            {campaigns.map((campaign) => (
-              <div key={campaign} className="flex justify-center">
+            {campaigns.map((campaign, colIdx) => (
+              <div
+                key={campaign}
+                className={`flex items-center justify-center py-2 transition-colors ${hoverRow === rowIdx || hoverCol === colIdx ? "bg-gray-50" : ""}`}
+                onMouseEnter={() => { setHoverRow(rowIdx); setHoverCol(colIdx); }}
+              >
                 {member.pending ? (
                   member.roles[campaign] && (
                     <span className="text-xs text-gray-400">
                       {member.roles[campaign]} (Pending)
                     </span>
                   )
+                ) : member.isCurrentUser ? (
+                  <span className="text-xs text-slate-900">{member.roles[campaign]}</span>
                 ) : (
                   <RoleSelect role={member.roles[campaign]} />
                 )}
