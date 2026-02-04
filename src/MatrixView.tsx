@@ -213,7 +213,7 @@ export default function MatrixView({ crosshair }: { crosshair: boolean }) {
   const [hoverCol, setHoverCol] = useState<number | null>(null);
 
   return (
-    <div className="bg-white min-h-screen p-8 font-sans">
+    <div className="bg-white h-screen flex flex-col p-8 font-sans">
       {/* Breadcrumb */}
       <p className="text-xs text-black mb-6">Spaces / People</p>
 
@@ -265,12 +265,12 @@ export default function MatrixView({ crosshair }: { crosshair: boolean }) {
 
       {/* Matrix Table */}
       <div
-        className="border-t border-gray-200 overflow-x-auto"
+        className="border-t border-gray-200 flex-1 min-h-0 overflow-auto"
         onMouseLeave={() => { setHoverRow(null); setHoverCol(null); }}
       >
         {/* Header Row */}
         <div
-          className="border-b border-gray-100 items-stretch"
+          className="border-b border-gray-100 items-stretch sticky top-0 bg-white z-10"
           style={{
             display: "grid",
             gridTemplateColumns: `minmax(180px, 1.5fr) repeat(${allCampaigns.length}, minmax(100px, 1fr))`,
@@ -280,7 +280,7 @@ export default function MatrixView({ crosshair }: { crosshair: boolean }) {
           {allCampaigns.map((campaign, colIdx) => (
             <div
               key={campaign.name}
-              className={`text-xs text-black text-center py-3 flex items-center justify-center transition-colors ${crosshair && hoverCol === colIdx ? "bg-gray-50" : ""}`}
+              className={`text-xs text-black text-center py-3 flex items-center justify-center transition-colors ${crosshair && hoverCol === colIdx ? "bg-gray-50" : "bg-white"}`}
             >
               {campaign.name}
             </div>
