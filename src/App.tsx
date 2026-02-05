@@ -1,12 +1,14 @@
 import { useState } from "react";
 import SpacesPeople from "./SpacesPeople";
 import MatrixView from "./MatrixView";
+import LinkGenerator from "./LinkGenerator";
+import LinkGenerator2 from "./LinkGenerator2";
 import { Agentation } from "agentation";
 
-type Option = "option1" | "option2";
+type Page = "matrix1" | "matrix2" | "linkgen1" | "linkgen2";
 
 function App() {
-  const [selected, setSelected] = useState<Option>("option1");
+  const [selected, setSelected] = useState<Page>("matrix1");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [crosshair, setCrosshair] = useState(true);
 
@@ -26,24 +28,44 @@ function App() {
 
         <nav className="space-y-1 px-2 mt-4">
           <button
-            onClick={() => setSelected("option1")}
+            onClick={() => setSelected("matrix1")}
             className={`w-full h-8 flex items-center whitespace-nowrap rounded text-xs transition-colors ${sidebarOpen ? "px-3" : "justify-center"} ${
-              selected === "option1"
+              selected === "matrix1"
                 ? "bg-gray-200 text-gray-900"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {sidebarOpen ? "Option 1" : "1"}
+            {sidebarOpen ? "Matrix 1" : "M1"}
           </button>
           <button
-            onClick={() => setSelected("option2")}
+            onClick={() => setSelected("matrix2")}
             className={`w-full h-8 flex items-center whitespace-nowrap rounded text-xs transition-colors ${sidebarOpen ? "px-3" : "justify-center"} ${
-              selected === "option2"
+              selected === "matrix2"
                 ? "bg-gray-200 text-gray-900"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {sidebarOpen ? "Option 2" : "2"}
+            {sidebarOpen ? "Matrix 2" : "M2"}
+          </button>
+          <button
+            onClick={() => setSelected("linkgen1")}
+            className={`w-full h-8 flex items-center whitespace-nowrap rounded text-xs transition-colors ${sidebarOpen ? "px-3" : "justify-center"} ${
+              selected === "linkgen1"
+                ? "bg-gray-200 text-gray-900"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            {sidebarOpen ? "Link Generator 1" : "L1"}
+          </button>
+          <button
+            onClick={() => setSelected("linkgen2")}
+            className={`w-full h-8 flex items-center whitespace-nowrap rounded text-xs transition-colors ${sidebarOpen ? "px-3" : "justify-center"} ${
+              selected === "linkgen2"
+                ? "bg-gray-200 text-gray-900"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            {sidebarOpen ? "Link Generator 2" : "L2"}
           </button>
         </nav>
 
@@ -57,14 +79,17 @@ function App() {
               <circle cx="7" cy="7" r="5" />
               <path d="M7 0v4M7 10v4M0 7h4M10 7h14" strokeLinecap="round" />
             </svg>
-            {sidebarOpen && <span className="whitespace-nowrap">Crosshair</span>}
+            {sidebarOpen && <span className="whitespace-nowrap">Table Crosshair</span>}
           </button>
         </div>
       </aside>
 
       {/* Main content */}
       <main className="flex-1 overflow-auto">
-        {selected === "option1" ? <SpacesPeople crosshair={crosshair} /> : <MatrixView crosshair={crosshair} />}
+        {selected === "matrix1" && <SpacesPeople crosshair={crosshair} />}
+        {selected === "matrix2" && <MatrixView crosshair={crosshair} />}
+        {selected === "linkgen1" && <LinkGenerator />}
+        {selected === "linkgen2" && <LinkGenerator2 />}
       </main>
 
       {import.meta.env.DEV && <Agentation />}
