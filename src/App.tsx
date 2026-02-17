@@ -3,9 +3,12 @@ import SpacesPeople from "./SpacesPeople";
 import MatrixView from "./MatrixView";
 import LinkGenerator from "./LinkGenerator";
 import LinkGenerator2 from "./LinkGenerator2";
+import LinkGenerator3 from "./LinkGenerator3";
+import DiagramsPage from "./DiagramsPage";
+import BeachWavesPage from "./BeachWavesPage";
 import { Agentation } from "agentation";
 
-type Page = "matrix1" | "matrix2" | "linkgen1" | "linkgen2";
+type Page = "matrix1" | "matrix2" | "linkgen1" | "linkgen2" | "linkgen3" | "diagrams" | "beachwaves";
 
 function App() {
   const [selected, setSelected] = useState<Page>("matrix1");
@@ -67,6 +70,16 @@ function App() {
           >
             {sidebarOpen ? "Link Generator 2" : "L2"}
           </button>
+          <button
+            onClick={() => setSelected("linkgen3")}
+            className={`w-full h-8 flex items-center whitespace-nowrap rounded text-xs transition-colors ${sidebarOpen ? "px-3" : "justify-center"} ${
+              selected === "linkgen3"
+                ? "bg-gray-200 text-gray-900"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            {sidebarOpen ? "Link Generator 3" : "L3"}
+          </button>
         </nav>
 
         {/* Crosshair toggle */}
@@ -90,6 +103,9 @@ function App() {
         {selected === "matrix2" && <MatrixView crosshair={crosshair} />}
         {selected === "linkgen1" && <LinkGenerator />}
         {selected === "linkgen2" && <LinkGenerator2 />}
+        {selected === "linkgen3" && <LinkGenerator3 />}
+        {selected === "diagrams" && <DiagramsPage />}
+        {selected === "beachwaves" && <BeachWavesPage />}
       </main>
 
       {import.meta.env.DEV && <Agentation />}

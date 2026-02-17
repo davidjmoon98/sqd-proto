@@ -40,6 +40,12 @@ export default function LinkGenerator2() {
   const [generatedLinks, setGeneratedLinks] = useState<GeneratedLink[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // SubIDs state
+  const [subIdsOpen, setSubIdsOpen] = useState(false);
+  const [subId1, setSubId1] = useState("");
+  const [subId2, setSubId2] = useState("");
+  const [subId3, setSubId3] = useState("");
+
   const filteredCampaigns = campaigns.filter(c =>
     c.name.toLowerCase().includes(campaignSearch.toLowerCase()) ||
     c.id.includes(campaignSearch)
@@ -73,11 +79,19 @@ export default function LinkGenerator2() {
 
   const handleGenerate = () => {
     if (selectedCampaign && selectedFunnel && selectedPartners.length > 0) {
-      const links = selectedPartners.map(partner => ({
-        id: partner.id,
-        name: partner.name,
-        url: "wefjwenfinuwefiwneiwnefi.cafwefw",
-      }));
+      const links = selectedPartners.map(partner => {
+        const baseUrl = "wefjwenfinuwefiwneiwnefi.cafwefw";
+        const params = new URLSearchParams();
+        if (subId1) params.append("c1", subId1);
+        if (subId2) params.append("c2", subId2);
+        if (subId3) params.append("c3", subId3);
+        const queryString = params.toString();
+        return {
+          id: partner.id,
+          name: partner.name,
+          url: queryString ? `${baseUrl}?${queryString}` : baseUrl,
+        };
+      });
       setGeneratedLinks(links);
     }
   };
@@ -95,167 +109,215 @@ export default function LinkGenerator2() {
       {/* Title */}
       <h1 className="text-sm text-black mb-8">Generate Tracking Links</h1>
 
-      {/* Input Row */}
-      <div className="flex items-start gap-4 mb-8">
-        {/* Campaign Dropdown */}
-        <div className="relative flex-1">
-          <div
-            onClick={() => setCampaignOpen(!campaignOpen)}
-            className="px-4 py-2 border border-gray-200 rounded text-xs cursor-pointer hover:border-gray-300 transition-colors"
-          >
-            {selectedCampaign ? (
-              <span className="text-black">{selectedCampaign.name}</span>
-            ) : (
-              <span className="text-gray-400">Select Campaign</span>
-            )}
-          </div>
-          {campaignOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-auto">
-              <input
-                type="text"
-                placeholder="Search"
-                value={campaignSearch}
-                onChange={(e) => setCampaignSearch(e.target.value)}
-                className="w-full px-4 py-2 text-xs placeholder-gray-400 outline-none border-b border-gray-100"
-                autoFocus
-              />
-              {filteredCampaigns.map((campaign) => (
-                <button
-                  key={campaign.id}
-                  onClick={() => {
-                    setSelectedCampaign(campaign);
-                    setCampaignOpen(false);
-                    setCampaignSearch("");
-                    // Reset funnel and partners when campaign changes
-                    setSelectedFunnel(null);
-                    setSelectedPartners([]);
-                  }}
-                  className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                >
-                  {campaign.name}
-                </button>
-              ))}
+      {/* Input Box */}
+      <div className="border border-gray-200 rounded-lg p-6 mb-8">
+        {/* Input Row */}
+        <div className="grid grid-cols-[1fr_1fr_1fr_auto] items-start gap-4">
+          {/* Campaign Dropdown */}
+          <div className="relative">
+            <div
+              onClick={() => setCampaignOpen(!campaignOpen)}
+              className="px-4 py-3 bg-gray-100 rounded-lg text-xs cursor-pointer hover:bg-gray-200 transition-colors"
+            >
+              {selectedCampaign ? (
+                <span className="text-black">{selectedCampaign.name}</span>
+              ) : (
+                <span className="text-gray-400">Select Campaign</span>
+              )}
             </div>
-          )}
-        </div>
-
-        {/* Funnel Dropdown */}
-        <div className="relative flex-1">
-          <div
-            onClick={() => selectedCampaign && setFunnelOpen(!funnelOpen)}
-            className={`px-4 py-2 border border-gray-200 rounded text-xs transition-colors ${
-              selectedCampaign ? "cursor-pointer hover:border-gray-300" : "cursor-not-allowed opacity-50"
-            }`}
-          >
-            {selectedFunnel ? (
-              <span className="text-black">{selectedFunnel.name}</span>
-            ) : (
-              <span className="text-gray-400">Select Funnel</span>
-            )}
-          </div>
-          {funnelOpen && selectedCampaign && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-auto">
-              <input
-                type="text"
-                placeholder="Search"
-                value={funnelSearch}
-                onChange={(e) => setFunnelSearch(e.target.value)}
-                className="w-full px-4 py-2 text-xs placeholder-gray-400 outline-none border-b border-gray-100"
-                autoFocus
-              />
-              {filteredFunnels.map((funnel) => (
-                <button
-                  key={funnel.id}
-                  onClick={() => {
-                    setSelectedFunnel(funnel);
-                    setFunnelOpen(false);
-                    setFunnelSearch("");
-                  }}
-                  className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                >
-                  {funnel.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Partners Dropdown */}
-        <div className="relative flex-1">
-          <div
-            onClick={() => selectedCampaign && setPartnersOpen(!partnersOpen)}
-            className={`px-4 py-2 border border-gray-200 rounded text-xs transition-colors ${
-              selectedCampaign ? "cursor-pointer hover:border-gray-300" : "cursor-not-allowed opacity-50"
-            }`}
-          >
-            {selectedPartners.length > 0 ? (
-              <span className="text-black truncate">
-                {selectedPartners.map(p => p.id).join(", ")}
-              </span>
-            ) : (
-              <span className="text-gray-400">Partners</span>
-            )}
-          </div>
-          {partnersOpen && selectedCampaign && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-auto">
-              <input
-                type="text"
-                placeholder="Search"
-                value={partnerSearch}
-                onChange={(e) => setPartnerSearch(e.target.value)}
-                className="w-full px-4 py-2 text-xs placeholder-gray-400 outline-none border-b border-gray-100"
-                autoFocus
-              />
-              <button
-                onClick={selectAllPartners}
-                className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 flex items-center gap-3"
-              >
-                <span className={`w-4 h-4 border rounded flex items-center justify-center ${
-                  selectedPartners.length === partners.length ? "bg-gray-300 border-gray-300" : "border-gray-300"
-                }`}>
-                  {selectedPartners.length === partners.length && (
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </span>
-                Select all Partners
-              </button>
-              {filteredPartners.map((partner) => {
-                const isSelected = selectedPartners.find(p => p.id === partner.id);
-                return (
+            {campaignOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-auto">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={campaignSearch}
+                  onChange={(e) => setCampaignSearch(e.target.value)}
+                  className="w-full px-4 py-2 text-xs placeholder-gray-400 outline-none border-b border-gray-100"
+                  autoFocus
+                />
+                {filteredCampaigns.map((campaign) => (
                   <button
-                    key={partner.id}
-                    onClick={() => togglePartner(partner)}
-                    className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center gap-3"
+                    key={campaign.id}
+                    onClick={() => {
+                      setSelectedCampaign(campaign);
+                      setCampaignOpen(false);
+                      setCampaignSearch("");
+                      // Reset funnel and partners when campaign changes
+                      setSelectedFunnel(null);
+                      setSelectedPartners([]);
+                    }}
+                    className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                   >
-                    <span className={`w-4 h-4 border rounded flex items-center justify-center ${
-                      isSelected ? "bg-gray-300 border-gray-300" : "border-gray-300"
-                    }`}>
-                      {isSelected && (
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </span>
-                    {partner.id} {partner.name}
+                    {campaign.name}
                   </button>
-                );
-              })}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Funnel Dropdown */}
+          <div className="relative">
+            <div
+              onClick={() => selectedCampaign && setFunnelOpen(!funnelOpen)}
+              className={`px-4 py-3 bg-gray-100 rounded-lg text-xs transition-colors ${
+                selectedCampaign ? "cursor-pointer hover:bg-gray-200" : "cursor-not-allowed opacity-50"
+              }`}
+            >
+              {selectedFunnel ? (
+                <span className="text-black">{selectedFunnel.name}</span>
+              ) : (
+                <span className="text-gray-400">Select Funnel</span>
+              )}
             </div>
-          )}
+            {funnelOpen && selectedCampaign && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-auto">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={funnelSearch}
+                  onChange={(e) => setFunnelSearch(e.target.value)}
+                  className="w-full px-4 py-2 text-xs placeholder-gray-400 outline-none border-b border-gray-100"
+                  autoFocus
+                />
+                {filteredFunnels.map((funnel) => (
+                  <button
+                    key={funnel.id}
+                    onClick={() => {
+                      setSelectedFunnel(funnel);
+                      setFunnelOpen(false);
+                      setFunnelSearch("");
+                    }}
+                    className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                  >
+                    {funnel.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Partners Dropdown */}
+          <div className="relative">
+            <div
+              onClick={() => selectedCampaign && setPartnersOpen(!partnersOpen)}
+              className={`px-4 py-3 bg-gray-100 rounded-lg text-xs transition-colors ${
+                selectedCampaign ? "cursor-pointer hover:bg-gray-200" : "cursor-not-allowed opacity-50"
+              }`}
+            >
+              {selectedPartners.length > 0 ? (
+                <span className="text-black truncate">
+                  {selectedPartners.map(p => p.id).join(", ")}
+                </span>
+              ) : (
+                <span className="text-gray-400">Partners</span>
+              )}
+            </div>
+            {partnersOpen && selectedCampaign && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-48 overflow-auto">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={partnerSearch}
+                  onChange={(e) => setPartnerSearch(e.target.value)}
+                  className="w-full px-4 py-2 text-xs placeholder-gray-400 outline-none border-b border-gray-100"
+                  autoFocus
+                />
+                <button
+                  onClick={selectAllPartners}
+                  className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 flex items-center gap-3"
+                >
+                  <span className={`w-4 h-4 border rounded flex items-center justify-center ${
+                    selectedPartners.length === partners.length ? "bg-gray-300 border-gray-300" : "border-gray-300"
+                  }`}>
+                    {selectedPartners.length === partners.length && (
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </span>
+                  Select all Partners
+                </button>
+                {filteredPartners.map((partner) => {
+                  const isSelected = selectedPartners.find(p => p.id === partner.id);
+                  return (
+                    <button
+                      key={partner.id}
+                      onClick={() => togglePartner(partner)}
+                      className="w-full text-left px-4 py-3 text-xs text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center gap-3"
+                    >
+                      <span className={`w-4 h-4 border rounded flex items-center justify-center ${
+                        isSelected ? "bg-gray-300 border-gray-300" : "border-gray-300"
+                      }`}>
+                        {isSelected && (
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </span>
+                      {partner.id} {partner.name}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Generate Button */}
+          <button
+            onClick={handleGenerate}
+            disabled={!canGenerate}
+            className={`px-6 py-3 text-white text-xs rounded-lg whitespace-nowrap ${
+              canGenerate ? "bg-[#1b1b1b]" : "bg-gray-300 cursor-not-allowed"
+            }`}
+          >
+            Generate Link
+          </button>
         </div>
 
-        {/* Generate Button */}
+        {/* Add SubIDs Toggle */}
         <button
-          onClick={handleGenerate}
-          disabled={!canGenerate}
-          className={`px-6 py-2 text-white text-xs rounded whitespace-nowrap ${
-            canGenerate ? "bg-[#1b1b1b]" : "bg-gray-300 cursor-not-allowed"
-          }`}
+          onClick={() => setSubIdsOpen(!subIdsOpen)}
+          className="flex items-center gap-2 mt-6 text-xs text-gray-400 hover:text-black transition-colors"
         >
-          Generate Link
+          <svg
+            className={`w-3 h-3 transition-transform ${subIdsOpen ? "" : "rotate-180"}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+          Add SubIDs (Optional)
         </button>
+
+        {/* SubIDs Fields */}
+        {subIdsOpen && (
+          <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-4 mt-4">
+            <input
+              type="text"
+              placeholder="c1"
+              value={subId1}
+              onChange={(e) => setSubId1(e.target.value)}
+              className="px-4 py-3 bg-gray-100 rounded-lg text-xs placeholder-gray-400 outline-none"
+            />
+            <input
+              type="text"
+              placeholder="c2"
+              value={subId2}
+              onChange={(e) => setSubId2(e.target.value)}
+              className="px-4 py-3 bg-gray-100 rounded-lg text-xs placeholder-gray-400 outline-none"
+            />
+            <input
+              type="text"
+              placeholder="c3"
+              value={subId3}
+              onChange={(e) => setSubId3(e.target.value)}
+              className="px-4 py-3 bg-gray-100 rounded-lg text-xs placeholder-gray-400 outline-none"
+            />
+            {/* Spacer to match Generate button width */}
+            <div className="px-6 py-3 invisible text-xs">Generate Link</div>
+          </div>
+        )}
       </div>
 
       {/* Content Area */}
